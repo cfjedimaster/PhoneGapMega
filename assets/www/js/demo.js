@@ -358,6 +358,40 @@ $("#capturepage").live("pagecreate", function(event) {
 	
 });
 
-window.onerror = function() {
-    alert("Error caught");
-};
+$("#mediapage").live("pagecreate", function(event) {
+	var page = this;
+	var mediaStatus;
+	
+	mediaSuccess = function(){
+	}
+
+	mediaError = function(error) {
+		alert('Media Error: '+error.message);
+	}
+	
+	var myMedia = new Media('/android_asset/www/media/midnight-ride.mp3', mediaSuccess, mediaError);
+
+	$("#mediaplayLink").live("click",function(e) {
+		myMedia.play();
+		mediaStatus = setInterval(function() {
+			myMedia.getCurrentPosition(
+				function(position) {
+					if(position > -1) $("#status",page).html("Second "+position+" of "+myMedia.getDuration() + " seconds.");
+
+				})
+		}, 1000);
+		e.preventDefault();
+	});
+	$("#mediapauseLink").live("click",function(e) {
+		myMedia.pause();
+		e.preventDefault();
+	});
+	$("#mediastopLink").live("click",function(e) {
+		$("#status", page).html("");
+		clearInterval(mediaStatus);
+		myMedia.stop();
+		e.preventDefault();
+	});
+
+	
+});
