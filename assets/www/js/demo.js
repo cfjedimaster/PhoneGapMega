@@ -395,3 +395,53 @@ $("#mediapage").live("pagecreate", function(event) {
 
 	
 });
+
+$("#storagepage").live("pagecreate", function(event) {
+	var page = this;
+	var db = window.openDatabase("mydb", "1.0", "Mega Demo", 1000000);
+	var dbReady = false;
+	
+	populate = function(tx) {
+		tx.executeSql('CREATE TABLE IF NOT EXISTS dblog(message,timestamp)');
+	}
+	
+	dbErrorHandler = function(err){
+		alert("Database Error: [" + err.code + "] " + err.message);
+	}
+	
+	dbReadyHandler = function(){
+		dbReady = true;
+	}
+	
+	//always run populate
+	db.transaction(populate, dbErrorHandler, dbReadyHandler);
+
+	showLog = function(tx,results) {
+		alert('hlloe '+results);
+		if (results.rows == undefined) {
+			var s = "<p>There is nothing in the database table yet.";
+		}
+		else {
+			var s = "<p>There are " + results.rows.length + " rows in the table so far.</p>";
+			for (var i = 0; i < results.rows.length; i++) {
+				s += results.rows.item(i).message + " at time " + results.rows.item(i).timestamp + "<br>";
+			}
+		}
+		$("#status", page).html(s);
+	}
+	
+	//Note, we are going to check dbReady status here and handle it,
+	//but in theory it would be better to simply disable the buttons and then
+	//renable them. It happens so quick though I don't think it matter.
+	$("#storageShowLink").live("click",function(e) {
+		if (!dbReady) {
+			alert("Database not quite ready - try again...");
+			return;
+		}
+		db.transaction(function(tx) {
+			tx.executeSql("select message, timestamp from dblog");
+		}, dbErrorHandler, showLog);
+		e.preventDefault();
+	});
+	
+});
