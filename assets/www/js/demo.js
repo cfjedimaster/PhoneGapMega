@@ -417,15 +417,9 @@ $("#storagepage").live("pagecreate", function(event) {
 	db.transaction(populate, dbErrorHandler, dbReadyHandler);
 
 	showLog = function(tx,results) {
-		alert('hlloe '+results);
-		if (results.rows == undefined) {
-			var s = "<p>There is nothing in the database table yet.";
-		}
-		else {
-			var s = "<p>There are " + results.rows.length + " rows in the table so far.</p>";
-			for (var i = 0; i < results.rows.length; i++) {
-				s += results.rows.item(i).message + " at time " + results.rows.item(i).timestamp + "<br>";
-			}
+		var s = "<p>There are " + results.rows.length + " rows in the table so far.</p>";
+		for (var i = 0; i < results.rows.length; i++) {
+			s += results.rows.item(i).message + " at time " + results.rows.item(i).timestamp + "<br>";
 		}
 		$("#status", page).html(s);
 	}
@@ -439,8 +433,21 @@ $("#storagepage").live("pagecreate", function(event) {
 			return;
 		}
 		db.transaction(function(tx) {
-			tx.executeSql("select message, timestamp from dblog");
-		}, dbErrorHandler, showLog);
+			tx.executeSql("select message, timestamp from dblog order by timestamp desc",[],showLog,dbErrorHandler);
+		}, dbErrorHandler);
+		e.preventDefault();
+	});
+
+	$("#storageAddLink").live("click",function(e) {
+		if (!dbReady) {
+			alert("Database not quite ready - try again...");
+			return;
+		}
+		db.transaction(function(tx) {
+			var msg = "Some random message: " + Math.floor(Math.random() * 100);
+			tx.executeSql("insert into dblog(message,timestamp) values(?,?)",[msg, new Date()]);
+			$("#status", page).html("A new row was inserted.");
+		}, dbErrorHandler);
 		e.preventDefault();
 	});
 	
