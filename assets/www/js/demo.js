@@ -452,3 +452,54 @@ $("#storagepage").live("pagecreate", function(event) {
 	});
 	
 });
+
+$("#remotedatapage").live("pagecreate", function(event) {
+	var page = this;
+		
+	$("#getDataLink").live("click",function(e) {
+		$.post("http://www.coldfusionjedi.com/demos/phonegap/remote.cfc?method=getrandom&returnformat=plain", {}, function(res,code) {
+			$("#status", page).html("Result from remote server was " + res);
+		});
+	});
+
+	
+});
+
+//Todo - I may want to deregister the event handlers on page exit
+$("#eventpage").live("pagecreate", function(event) {
+	var page = this;
+	
+	backbuttonFunction = function(){
+		$("#status",page).append("Back button clicked.<br/>");
+	}	
+	menubuttonFunction = function(){
+		$("#status",page).append("Menu button clicked.<br/>");
+	}	
+	searchbuttonFunction = function(){
+		$("#status",page).append("Search button clicked.<br/>");
+	}	
+	pauseFunction = function(){
+		$("#status",page).append("Pause event.<br/>");
+	}	
+	resumeFunction = function(){
+		$("#status",page).append("Resume event.<br/>");
+	}	
+	offlineFunction = function(){
+		$("#status",page).append("Offline event.<br/>");
+	}	
+	onlineFunction = function(){
+		$("#status",page).append("Online event.<br/>");
+	}	
+
+
+	document.addEventListener("backbutton", backbuttonFunction, false);
+	document.addEventListener("menubutton", menubuttonFunction, false);
+	document.addEventListener("searchbutton", searchbuttonFunction, false);
+
+	document.addEventListener("pause", pauseFunction, false);
+	document.addEventListener("resume", resumeFunction, false);
+
+	document.addEventListener("offline", offlineFunction, false);
+	document.addEventListener("online", onlineFunction, false);
+	
+});
