@@ -465,6 +465,16 @@ $("#remotedatapage").live("pagecreate", function(event) {
 	
 });
 
+var backbuttonFunction;
+
+
+$("#eventpage").live("pagehide", function(event) {
+	document.removeEventListener("backbutton",backbuttonFunction,false);
+	document.removeEventListener("menubutton",menubuttonFunction,false);
+	document.removeEventListener("searchbutton",searchbuttonFunction,false);
+	//not removing pause,resume,offline,online purposively
+});
+
 //Todo - I may want to deregister the event handlers on page exit
 $("#eventpage").live("pagecreate", function(event) {
 	var page = this;
